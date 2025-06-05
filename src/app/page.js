@@ -13,9 +13,7 @@ export default function PathFinderLanding() {
         <div className="container mx-auto px-4 py-4">
           <nav className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-teal-500 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">P</span>
-              </div>
+              <img src="/Clip path group.png" alt="PathFinder Logo" width={32} height={32} className="object-contain" />
               <span className="font-bold text-xl text-gray-900">PathFinder</span>
             </div>
 
@@ -207,7 +205,7 @@ export default function PathFinderLanding() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-16">
-            <p className="text-gray-500 mb-4">We've answered your questions</p>
+            <p className="text-[#222831] mb-4 italic">We've answered your questions</p>
             <h2 className="text-3xl font-bold text-gray-900">Frequently Asked Questions</h2>
           </div>
 
