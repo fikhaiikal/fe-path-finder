@@ -1,40 +1,73 @@
+"use client";
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Upload, Check, Plus } from "lucide-react"
 import Link from "next/link"
+import { motion } from "framer-motion"
 
 export default function PathFinderLanding() {
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white font-montserrat">
       {/* Header */}
-      <header className="border-b bg-white">
+      <header className="border-b bg-white sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <nav className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-teal-500 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">P</span>
-              </div>
+              <img src="/Clip path group.png" alt="PathFinder Logo" width={32} height={32} className="object-contain" />
               <span className="font-bold text-xl text-gray-900">PathFinder</span>
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="#" className="text-gray-600 hover:text-gray-900">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => scrollToSection('cv-review')}
+                className="text-gray-600 hover:text-gray-900"
+              >
                 CV Review
-              </Link>
-              <Link href="#" className="text-gray-600 hover:text-gray-900">
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => scrollToSection('job-recommendation')}
+                className="text-gray-600 hover:text-gray-900"
+              >
                 Job Recommendation
-              </Link>
-              <Link href="#" className="text-gray-600 hover:text-gray-900">
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => scrollToSection('pricing')}
+                className="text-gray-600 hover:text-gray-900"
+              >
                 Pricing
-              </Link>
-              <Link href="#" className="text-gray-600 hover:text-gray-900">
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => scrollToSection('faq')}
+                className="text-gray-600 hover:text-gray-900"
+              >
                 FAQ
-              </Link>
-              <Link href="#" className="text-gray-600 hover:text-gray-900">
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => scrollToSection('contact')}
+                className="text-gray-600 hover:text-gray-900"
+              >
                 Contact Us
-              </Link>
+              </motion.button>
             </div>
 
             <div className="flex items-center space-x-4">
@@ -68,7 +101,14 @@ export default function PathFinderLanding() {
           </div>
         </div>
         {/* CV Review Card Section with background image */}
-        <div className="py-42 bg-gray-50 flex justify-center relative overflow-hidden">
+        <motion.div
+          id="cv-review"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="py-42 bg-gray-50 flex justify-center relative overflow-hidden"
+        >
           <div
             className="absolute inset-0 bg-cover bg-center opacity-80"
             style={{
@@ -95,11 +135,18 @@ export default function PathFinderLanding() {
               </CardContent>
             </Card>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Job Recommendation Section */}
-      <section className="py-20 bg-white">
+      <motion.section
+        id="job-recommendation"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="py-20 bg-white"
+      >
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div className="pt-10">
@@ -136,10 +183,17 @@ export default function PathFinderLanding() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Pricing Section */}
-      <section className="py-20 bg-gray-50">
+      <motion.section
+        id="pricing"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="py-20 bg-white"
+      >
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-[#051D40] mb-4">Plans & Pricing</h2>
@@ -201,65 +255,85 @@ export default function PathFinderLanding() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-white">
+      <motion.section
+        id="faq"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="py-20 bg-white"
+      >
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-16">
-            <p className="text-gray-500 mb-4">We've answered your questions</p>
+            <p className="text-[#222831] mb-4 italic">We've answered your questions</p>
             <h2 className="text-3xl font-bold text-gray-900">Frequently Asked Questions</h2>
           </div>
 
           <div className="space-y-4">
             <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left border rounded-lg hover:bg-gray-50">
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-all duration-200 hover:shadow-md group">
                 <span className="font-medium">What is PathFinder and how does it work?</span>
-                <Plus className="w-5 h-5" />
+                <Plus className="w-5 h-5 transition-transform duration-400 group-data-[state=open]:rotate-45" />
               </CollapsibleTrigger>
-              <CollapsibleContent className="p-4 border-t">
-                <p className="text-gray-600 text-justify">
-                  PathFinder is an AI-powered platform that analyzes your CV using OCR and NLP to provide personalized
-                  feedback and job recommendations that align with your skills and background.
-                </p>
+              <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                <div className="p-4 border-t animate-fade-in animate-slide-in-from-top duration-400">
+                  <p className="text-gray-600 text-justify">
+                    PathFinder is an AI-powered platform that analyzes your CV using OCR and NLP to provide personalized
+                    feedback and job recommendations that align with your skills and background.
+                  </p>
+                </div>
               </CollapsibleContent>
             </Collapsible>
 
             <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left border rounded-lg hover:bg-gray-50">
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-all duration-200 hover:shadow-md group">
                 <span className="font-medium">Do I need to manually search for jobs on PathFinder?</span>
-                <Plus className="w-5 h-5" />
+                <Plus className="w-5 h-5 transition-transform duration-400 group-data-[state=open]:rotate-45" />
               </CollapsibleTrigger>
-              <CollapsibleContent className="p-4 border-t">
-                <p className="text-gray-600">
-                  No, PathFinder automatically recommends job listings that match your competencies, pulled from various
-                  job portals through APIs or web scraping.
-                </p>
+              <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                <div className="p-4 border-t animate-fade-in animate-slide-in-from-top duration-400">
+                  <p className="text-gray-600">
+                    No, PathFinder automatically recommends job listings that match your competencies, pulled from
+                    various job portals through APIs or web scraping.
+                  </p>
+                </div>
               </CollapsibleContent>
             </Collapsible>
 
             <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left border rounded-lg hover:bg-gray-50">
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition-all duration-200 hover:shadow-md group">
                 <span className="font-medium">Is my personal data safe when I upload my CV?</span>
-                <Plus className="w-5 h-5" />
+                <Plus className="w-5 h-5 transition-transform duration-400 group-data-[state=open]:rotate-45" />
               </CollapsibleTrigger>
-              <CollapsibleContent className="p-4 border-t">
-                <p className="text-gray-600">
-                  Yes, we prioritize user privacy and security. Your data is processed securely and used solely to
-                  provide tailored recommendations and feedback.
-                </p>
+              <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                <div className="p-4 border-t animate-fade-in animate-slide-in-from-top duration-400">
+                  <p className="text-gray-600">
+                    Yes, we prioritize user privacy and security. Your data is processed securely and used solely to
+                    provide tailored recommendations and feedback.
+                  </p>
+                </div>
               </CollapsibleContent>
             </Collapsible>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Footer */}
-      <footer className="bg-black text-white py-8">
+      <motion.footer
+        id="contact"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="bg-black text-white py-8"
+      >
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm">© Copyright CC25-CF013. All Rights Reserved.</p>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   )
 }
