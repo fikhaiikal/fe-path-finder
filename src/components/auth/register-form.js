@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Mail, Lock, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -13,6 +14,9 @@ export default function RegisterForm() {
     password: "",
     confirmPassword: "",
   });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,14 +28,48 @@ export default function RegisterForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement register logic
-    console.log("Register attempt with:", formData);
+    setError("");
+    if (formData.password !== formData.confirmPassword) {
+      setError("Password dan konfirmasi password tidak sama");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:5000/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        setError(err.message || "Registrasi gagal");
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      if (typeof window !== "undefined") {
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+      router.push("/");
+    } catch (err) {
+      setError("Terjadi kesalahan. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Card className="w-full max-w-md mx-auto shadow-none border-none">
       <CardContent className="p-0">
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="text-red-500 text-sm text-center mb-2">{error}</div>
+          )}
           <div className="space-y-2">
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -103,8 +141,9 @@ export default function RegisterForm() {
           <Button
             type="submit"
             className="w-full bg-gradient-to-r from-[#0B2447] to-[#17E3B2] hover:from-[#17E3B2] hover:to-[#0B2447] text-white font-semibold text-lg py-2 rounded-md border-0 shadow-none"
+            disabled={loading}
           >
-            Create Account
+            {loading ? "Loading..." : "Create Account"}
           </Button>
         </form>
         <div className="mt-4 text-center text-sm">
