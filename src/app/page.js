@@ -9,6 +9,57 @@ import { Upload, Check, Plus, FileText } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
+
+function DonutChart({ percent }) {
+  const radius = 120;
+  const stroke = 42;
+  const normalizedRadius = radius - stroke / 2;
+  const circumference = normalizedRadius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (percent / 100) * circumference;
+
+  return (
+    <svg height={radius * 2} width={radius * 2} className="block mx-auto">
+      <defs>
+        <linearGradient id="donutGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#0B2447" />
+          <stop offset="100%" stopColor="#17E3B2" />
+        </linearGradient>
+      </defs>
+      <circle
+        stroke="#e5e7eb"
+        fill="transparent"
+        strokeWidth={stroke}
+        r={normalizedRadius}
+        cx={radius}
+        cy={radius}
+      />
+      <circle
+        stroke="url(#donutGradient)"
+        fill="transparent"
+        strokeWidth={stroke}
+        strokeLinecap="square"
+        strokeDasharray={circumference + " " + circumference}
+        style={{ strokeDashoffset, transition: "stroke-dashoffset 0.5s" }}
+        r={normalizedRadius}
+        cx={radius}
+        cy={radius}
+      />
+      <text
+        x="50%"
+        y="50%"
+        textAnchor="middle"
+        dy=".3em"
+        fontSize="2.5rem"
+        fontWeight="bold"
+        fill="#10375C"
+        dominantBaseline="middle"
+      >
+        {percent}%
+      </text>
+    </svg>
+  );
+}
 
 export default function LandingPage() {
   const [user, setUser] = useState(null);
@@ -16,11 +67,14 @@ export default function LandingPage() {
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [jobResult, setJobResult] = useState(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const userStr = localStorage.getItem("user");
       setUser(userStr ? JSON.parse(userStr) : null);
+      const jobResultStr = localStorage.getItem("jobResult");
+      setJobResult(jobResultStr ? JSON.parse(jobResultStr) : null);
     }
   }, []);
 
@@ -74,8 +128,10 @@ export default function LandingPage() {
       if (!res.ok) {
         throw new Error("Failed to upload CV");
       }
+      const data = await res.json();
+      setJobResult(data);
+      localStorage.setItem("jobResult", JSON.stringify(data));
       alert("CV uploaded and analyzed successfully!");
-      // TODO: handle response (show result, etc)
     } catch (err) {
       alert("Failed to upload CV. Please try again.");
     } finally {
@@ -208,45 +264,114 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="text-center mt-16">
-            <div className="mb-8">
-              <img 
-                src="/70e2345212a7b1fe33ef11e848f99e7e76336e27.png" 
-                alt="Job recommendations illustration" 
-                className="max-w-xs mx-auto"
-              />
-            </div>
-            {user ? (
-              <>
-                <h3 className="text-3xl font-bold text-black-900 mb-4">
-                  Ready to discover your best-fit jobs?
-                </h3>
-                <p className="text-black-600 mb-8 max-w-2xl mx-auto">
-                  Upload your CV and let our AI match you with opportunities that fit your skills and ambitions. Start your journey to a brighter career today!
-                </p>
-              </>
-            ) : (
-              <>
-                <h3 className="text-3xl font-bold text-black-900 mb-4">
-                  Sign in to see job position recommendations for you.
-                </h3>
-                <p className="text-black-600 mb-8 max-w-2xl mx-auto">
-                  60.52% of the workforce in Indonesia are employed in jobs that do not match their educational level and/or
-                  field of study.
-                </p>
-                <div className="flex justify-center space-x-4">
-                  <Link href="/login">
-                    <Button variant="ghost" className="text-[#17E3B2]">
-                      Log In
-                    </Button>
-                  </Link>
-                  <Link href="/register">
-                    <Button className="bg-[#17E3B2] hover:bg-[#14c99d] text-white">Sign Up</Button>
-                  </Link>
+          {jobResult && jobResult.data && jobResult.data.jobs && jobResult.data.jobs.length > 0 ? (
+            <div className="mt-16 space-y-12">
+              {jobResult.data.jobs.map((group, idx) => (
+                <div key={group.job} className="flex flex-col md:flex-row md:items-center md:space-x-8 bg-white p-6">
+                  <div className="flex-shrink-0 flex justify-center items-center mb-4 mr-10 md:mb-0">
+                    <DonutChart percent={group.percent} />
+                  </div>
+                  <div className="flex-1 ml-10">
+                    <h3 className="text-2xl text-[#10375C] mb-4">
+                      You're match as <span className="text-[#051D40] font-bold">{group.job.charAt(0).toUpperCase() + group.job.slice(1)}</span>
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {group.list_jobs.slice(0, 2).map((job, i) => (
+                        <div
+                          key={job.title + job.company_name}
+                          className={`border rounded-xl p-5 bg-white shadow-sm flex flex-col justify-between h-full transition-all duration-200 ${i === 1 ? 'border-2 border-[#10375C]' : 'border border-gray-200'}`}
+                        >
+                          <div className="flex items-center mb-3 space-x-3">
+                            {job.thumbnail ? (
+                              <Image src={job.thumbnail} alt={job.company_name} width={32} height={32} className="rounded-full object-cover" />
+                            ) : (
+                              <div className="w-8 h-8 bg-gray-200 rounded-full" />
+                            )}
+                            <div>
+                              <div className="font-semibold text-[#10375C] text-base leading-tight">{job.company_name}</div>
+                              <div className="text-xs text-gray-400">{job.title}</div>
+                            </div>
+                          </div>
+                          <div className="text-sm text-gray-600 space-y-1 mb-4">
+                            <div className="flex items-center space-x-2">
+                              <span role="img" aria-label="location">📍</span>
+                              <span>{job.location}</span>
+                            </div>
+                            {job.detected_extensions && job.detected_extensions.schedule_type && (
+                              <div className="flex items-center space-x-2">
+                                <span role="img" aria-label="type">💼</span>
+                                <span>{job.detected_extensions.schedule_type}</span>
+                              </div>
+                            )}
+                            {job.detected_extensions && job.detected_extensions.salary && (
+                              <div className="flex items-center space-x-2">
+                                <span role="img" aria-label="salary">💰</span>
+                                <span>{job.detected_extensions.salary}</span>
+                              </div>
+                            )}
+                            {job.detected_extensions && job.detected_extensions.posted_at && (
+                              <div className="flex items-center space-x-2">
+                                <span role="img" aria-label="duration">⏳</span>
+                                <span>{job.detected_extensions.posted_at}</span>
+                              </div>
+                            )}
+                          </div>
+                          <a
+                            href={job.share_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-auto"
+                          >
+                            <Button className="w-full bg-[#10375C] hover:bg-[#17E3B2] text-white">Details</Button>
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center mt-16">
+              <div className="mb-8">
+                <img 
+                  src="/70e2345212a7b1fe33ef11e848f99e7e76336e27.png" 
+                  alt="Job recommendations illustration" 
+                  className="max-w-xs mx-auto"
+                />
+              </div>
+              {user ? (
+                <>
+                  <h3 className="text-3xl font-bold text-black-900 mb-4">
+                    Ready to discover your best-fit jobs?
+                  </h3>
+                  <p className="text-black-600 mb-8 max-w-2xl mx-auto">
+                    Upload your CV and let our AI match you with opportunities that fit your skills and ambitions. Start your journey to a brighter career today!
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-3xl font-bold text-black-900 mb-4">
+                    Sign in to see job position recommendations for you.
+                  </h3>
+                  <p className="text-black-600 mb-8 max-w-2xl mx-auto">
+                    60.52% of the workforce in Indonesia are employed in jobs that do not match their educational level and/or
+                    field of study.
+                  </p>
+                  <div className="flex justify-center space-x-4">
+                    <Link href="/login">
+                      <Button variant="ghost" className="text-[#17E3B2]">
+                        Log In
+                      </Button>
+                    </Link>
+                    <Link href="/register">
+                      <Button className="bg-[#17E3B2] hover:bg-[#14c99d] text-white">Sign Up</Button>
+                    </Link>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </motion.section>
 
