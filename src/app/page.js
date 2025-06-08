@@ -78,6 +78,13 @@ export default function LandingPage() {
     }
   }, []);
 
+  // Reset jobResult di state jika user logout
+  useEffect(() => {
+    if (!user) {
+      setJobResult(null);
+    }
+  }, [user]);
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type === "application/pdf") {

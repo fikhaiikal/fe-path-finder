@@ -46,8 +46,9 @@ export default function Header() {
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
+    localStorage.removeItem("jobResult");
     setUser(null);
-    router.push("/login");
+    router.push("/");
   };
 
   const scrollToSection = (sectionId) => {

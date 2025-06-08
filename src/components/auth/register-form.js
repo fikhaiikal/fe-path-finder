@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
-    name: "",
+    fullname: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -39,7 +39,7 @@ export default function RegisterForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: formData.name,
+          fullname: formData.fullname,
           email: formData.email,
           password: formData.password,
         }),
@@ -51,11 +51,7 @@ export default function RegisterForm() {
         return;
       }
       const data = await res.json();
-      if (typeof window !== "undefined") {
-        localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("user", JSON.stringify(data.user));
-      }
-      router.push("/");
+      router.push("/login");
     } catch (err) {
       setError("Terjadi kesalahan. Silakan coba lagi.");
     } finally {
@@ -76,11 +72,11 @@ export default function RegisterForm() {
                 <User size={18} />
               </span>
               <input
-                id="name"
-                name="name"
+                id="fullname"
+                name="fullname"
                 type="text"
                 placeholder="Full Name"
-                value={formData.name}
+                value={formData.fullname}
                 onChange={handleChange}
                 className="w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#17E3B2]"
                 required
