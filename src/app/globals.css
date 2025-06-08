@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @custom-variant dark (&:is(.dark *));
 
@@ -113,9 +115,10 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    /* custom global style jika perlu */
   }
   body {
-    @apply bg-background text-foreground;
+    /* Hapus atau ganti baris berikut karena menyebabkan error build */
+    /* @apply bg-background text-foreground; */
   }
 }
