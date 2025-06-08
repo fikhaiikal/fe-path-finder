@@ -5,11 +5,84 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Upload, Check, Plus } from "lucide-react";
+import { Upload, Check, Plus, FileText } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
 
 export default function LandingPage() {
+  const [user, setUser] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [dragActive, setDragActive] = useState(false);
+  const inputRef = useRef(null);
+  const [analyzing, setAnalyzing] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userStr = localStorage.getItem("user");
+      setUser(userStr ? JSON.parse(userStr) : null);
+    }
+  }, []);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === "application/pdf") {
+      setSelectedFile(file);
+    } else {
+      alert("Only PDF files are allowed.");
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === "application/pdf") {
+      setSelectedFile(file);
+    } else {
+      alert("Only PDF files are allowed.");
+    }
+  };
+
+  const handleButtonClick = () => {
+    inputRef.current.click();
+  };
+
+  const handleAnalyzeCV = async () => {
+    if (!selectedFile) return;
+    setAnalyzing(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      const res = await fetch("http://localhost:5000/upload/cv", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        throw new Error("Failed to upload CV");
+      }
+      alert("CV uploaded and analyzed successfully!");
+      // TODO: handle response (show result, etc)
+    } catch (err) {
+      alert("Failed to upload CV. Please try again.");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -65,15 +138,46 @@ export default function LandingPage() {
                 <CardDescription className="text-left">Upload your CV or Resume and let the magic work</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="border-2 border-dashed border-[#222831] rounded-lg p-8 text-center">
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <div
+                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${dragActive ? 'border-[#17E3B2] bg-teal-50' : 'border-[#222831]'}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={handleButtonClick}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    ref={inputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                  />
+                  {selectedFile ? (
+                    <FileText className="w-12 h-12 text-[#222831] mx-auto mb-4" />
+                  ) : (
+                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  )}
                   <p className="text-gray-600 mb-2">
-                    Drag your files or <span className="text-[#222831] font-medium">browse</span>
+                    {selectedFile ? (
+                      <span className="text-[#222831] font-medium">{selectedFile.name}</span>
+                    ) : (
+                      <>
+                        Drag your PDF file here or <span className="text-[#222831] font-medium underline">browse</span>
+                      </>
+                    )}
                   </p>
-                  <p className="text-sm text-gray-400">Less than 10MB are allowed</p>
+                  <p className="text-sm text-gray-400">Only PDF files. Max 10MB.</p>
                 </div>
                 <p className="text-xs text-gray-400 mt-2">Only support .pdf files</p>
-                <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white">Analyze CV</Button>
+                <Button
+                  className="w-full bg-teal-500 hover:bg-teal-600 text-white"
+                  onClick={selectedFile ? handleAnalyzeCV : handleButtonClick}
+                  type="button"
+                  disabled={analyzing || (!selectedFile && !analyzing)}
+                >
+                  {analyzing ? "Analyzing..." : selectedFile ? "Analyze CV" : "Upload CV"}
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -97,7 +201,9 @@ export default function LandingPage() {
             </div>
             <div className="text-right pt-10">
               <p className="text-gray-600">
-                There are some job recommendations that most suitable for you based on your CV or Resume
+                {user
+                  ? "Upload your CV now and unlock a world of personalized job recommendations tailored just for you. Take the next step in your career journey—your dream job could be one click away!"
+                  : "There are some job recommendations that most suitable for you based on your CV or Resume"}
               </p>
             </div>
           </div>
@@ -110,23 +216,36 @@ export default function LandingPage() {
                 className="max-w-xs mx-auto"
               />
             </div>
-            <h3 className="text-3xl font-bold text-black-900 mb-4">
-              Sign in to see job position recommendations for you.
-            </h3>
-            <p className="text-black-600 mb-8 max-w-2xl mx-auto">
-              60.52% of the workforce in Indonesia are employed in jobs that do not match their educational level and/or
-              field of study.
-            </p>
-            <div className="flex justify-center space-x-4">
-              <Link href="/login">
-                <Button variant="ghost" className="text-[#17E3B2]">
-                  Log In
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button className="bg-[#17E3B2] hover:bg-[#14c99d] text-white">Sign Up</Button>
-              </Link>
-            </div>
+            {user ? (
+              <>
+                <h3 className="text-3xl font-bold text-black-900 mb-4">
+                  Ready to discover your best-fit jobs?
+                </h3>
+                <p className="text-black-600 mb-8 max-w-2xl mx-auto">
+                  Upload your CV and let our AI match you with opportunities that fit your skills and ambitions. Start your journey to a brighter career today!
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-3xl font-bold text-black-900 mb-4">
+                  Sign in to see job position recommendations for you.
+                </h3>
+                <p className="text-black-600 mb-8 max-w-2xl mx-auto">
+                  60.52% of the workforce in Indonesia are employed in jobs that do not match their educational level and/or
+                  field of study.
+                </p>
+                <div className="flex justify-center space-x-4">
+                  <Link href="/login">
+                    <Button variant="ghost" className="text-[#17E3B2]">
+                      Log In
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button className="bg-[#17E3B2] hover:bg-[#14c99d] text-white">Sign Up</Button>
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </motion.section>
