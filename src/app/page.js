@@ -152,7 +152,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="bg-white">
-        <div className="container mx-auto px-4 pt-10">
+        <div className="container mx-auto px-4 pt-10 pb-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <p className="text-[#222831] mb-4 italic">Discover Careers, Unleash Potential</p>
@@ -162,8 +162,8 @@ export default function LandingPage() {
                 <span className="inline-block mt-2">Based on <span className="text-[#17E3B2]">CV</span> Competencies</span>
               </h1>
             </div>
-            <div className="text-gray-600 space--4 flex justify-end">
-              <p>
+            <div className="text-gray-600 flex justify-end">
+              <p className="text-lg leading-[30px]">
                 AI-powered platform that analyzes users' CVs, provides personalized feedback, and recommends suitable
                 job opportunities based on skills, streamlining the job search and recruitment process.
               </p>
@@ -178,7 +178,7 @@ export default function LandingPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="py-42 bg-gray-50 flex justify-center relative overflow-hidden"
+          className="py-20 bg-gray-50 flex justify-center relative overflow-hidden"
         >
           <div
             className="absolute inset-0 bg-cover bg-center opacity-80"
