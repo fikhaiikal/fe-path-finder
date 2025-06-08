@@ -35,7 +35,7 @@ export default function RegisterForm() {
     }
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/users/register", {
+      const res = await fetch("https://be-path-finder.onrender.com/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

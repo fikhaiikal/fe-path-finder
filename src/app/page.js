@@ -121,7 +121,7 @@ export default function LandingPage() {
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
-      const res = await fetch("http://localhost:5000/upload/cv", {
+      const res = await fetch("https://be-path-finder.onrender.com/upload/cv", {
         method: "POST",
         body: formData,
       });
