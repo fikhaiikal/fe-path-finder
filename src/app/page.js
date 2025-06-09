@@ -286,7 +286,7 @@ export default function LandingPage() {
                       {group.list_jobs.slice(0, 2).map((job, i) => (
                         <div
                           key={job.title + job.company_name}
-                          className={`border rounded-xl p-5 bg-white shadow-sm flex flex-col justify-between h-full transition-all duration-200 ${i === 1 ? 'border-2 border-[#10375C]' : 'border border-gray-200'}`}
+                          className={`border rounded-xl p-5 bg-white shadow-sm flex flex-col justify-between h-full transition-all duration-200 ${i === 1 ? 'border-2 border-gray' : 'border border-gray-200'}`}
                         >
                           <div className="flex items-center mb-3 space-x-3">
                             {job.thumbnail ? (
