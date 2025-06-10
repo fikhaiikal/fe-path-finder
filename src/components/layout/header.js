@@ -68,7 +68,7 @@ export default function Header() {
           </Link>
 
           {!isAuthPage && (
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-8 nav-hide-mid">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -157,6 +157,13 @@ export default function Header() {
           </div>
         </nav>
       </div>
+      <style jsx>{`
+        @media (min-width: 770px) and (max-width: 1020px) {
+          .nav-hide-mid {
+            display: none !important;
+          }
+        }
+      `}</style>
     </header>
   );
 } 
