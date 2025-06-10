@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Upload, Check, Plus, FileText } from "lucide-react";
+import { Upload, Check, Plus, FileText, X } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
@@ -68,6 +68,9 @@ export default function LandingPage() {
   const inputRef = useRef(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [jobResult, setJobResult] = useState(null);
+  const [loginError, setLoginError] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -89,6 +92,19 @@ export default function LandingPage() {
     const file = e.target.files[0];
     if (file && file.type === "application/pdf") {
       setSelectedFile(file);
+      setUploading(true);
+      setUploadProgress(0);
+      // Simulasi animasi progress
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        setUploadProgress(progress);
+        if (progress >= 100) {
+          clearInterval(interval);
+          setUploading(false);
+          setUploadProgress(100);
+        }
+      }, 20); // 2 detik total
     } else {
       alert("Only PDF files are allowed.");
     }
@@ -123,6 +139,11 @@ export default function LandingPage() {
   };
 
   const handleAnalyzeCV = async () => {
+    setLoginError("");
+    if (!user) {
+      setLoginError("You must be logged in to analyze your CV.");
+      return;
+    }
     if (!selectedFile) return;
     setAnalyzing(true);
     try {
@@ -144,6 +165,12 @@ export default function LandingPage() {
     } finally {
       setAnalyzing(false);
     }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    setUploadProgress(0);
+    setUploading(false);
   };
 
   const scrollToSection = (sectionId) => {
@@ -185,7 +212,7 @@ export default function LandingPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="py-20 bg-gray-50 flex justify-center relative overflow-hidden"
+          className="py-20 bg-gray-50 flex justify-center relative overflow-hidden px-2 sm:px-0"
         >
           <div
             className="absolute inset-0 bg-cover bg-center opacity-80"
@@ -197,12 +224,12 @@ export default function LandingPage() {
           <div className="relative w-full max-w-md">
             <Card className="w-full bg-white shadow-xl">
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl text-[#051D40] text-left font-bold">Review your CV now!</CardTitle>
-                <CardDescription className="text-left">Upload your CV or Resume and let the magic work</CardDescription>
+                <CardTitle className="text-2xl text-[#051D40] text-left font-bold sm:text-2xl text-lg">Review your CV now!</CardTitle>
+                <CardDescription className="text-left sm:text-base text-sm">Upload your CV or Resume and let the magic work</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div
-                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${dragActive ? 'border-[#17E3B2] bg-teal-50' : 'border-[#222831]'}`}
+                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${dragActive ? 'border-[#17E3B2] bg-teal-50' : 'border-[#222831]'} sm:p-8 p-4`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
@@ -217,30 +244,44 @@ export default function LandingPage() {
                     onChange={handleFileChange}
                   />
                   {selectedFile ? (
-                    <FileText className="w-12 h-12 text-[#222831] mx-auto mb-4" />
+                    <div className="w-full flex flex-col items-center">
+                      <div className="w-full bg-white rounded-lg shadow border flex items-center px-4 py-2 mb-2 relative">
+                        <FileText className="w-8 h-8 text-red-500 mr-3" />
+                        <div className="flex-1 text-left">
+                          <div className="font-medium text-[#222831] text-sm break-all">{selectedFile.name}</div>
+                          <div className="text-xs text-gray-400">{(selectedFile.size/1024).toFixed(0)}kb</div>
+                        </div>
+                        <button onClick={(e) => {e.stopPropagation(); handleRemoveFile();}} className="ml-2 p-1 rounded hover:bg-gray-100">
+                          <X className="w-4 h-4 text-gray-400" />
+                        </button>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 mb-2 overflow-hidden">
+                        <div className="bg-gradient-to-r from-[#17E3B2] to-[#0B2447] h-2 rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
+                      </div>
+                      <div className="w-full text-right text-xs text-gray-500 mb-2">{uploadProgress}%</div>
+                    </div>
                   ) : (
-                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  )}
-                  <p className="text-gray-600 mb-2">
-                    {selectedFile ? (
-                      <span className="text-[#222831] font-medium">{selectedFile.name}</span>
-                    ) : (
-                      <>
+                    <>
+                      <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4 sm:w-12 sm:h-12 w-8 h-8" />
+                      <p className="text-gray-600 mb-2 sm:text-base text-sm">
                         Drag your PDF file here or <span className="text-[#222831] font-medium underline">browse</span>
-                      </>
-                    )}
-                  </p>
-                  <p className="text-sm text-gray-400">Only PDF files. Max 10MB.</p>
+                      </p>
+                    </>
+                  )}
+                  <p className="text-sm text-gray-400 sm:text-sm text-xs">Only PDF files. Max 10MB.</p>
                 </div>
-                <p className="text-xs text-gray-400 mt-2">Only support .pdf files</p>
+                <p className="text-xs text-gray-400 mt-2 sm:text-xs text-[10px]">Only support .pdf files</p>
                 <Button
-                  className="w-full bg-teal-500 hover:bg-teal-600 text-white"
+                  className="w-full bg-teal-500 hover:bg-teal-600 text-white sm:text-base text-sm py-2 sm:py-3"
                   onClick={selectedFile ? handleAnalyzeCV : handleButtonClick}
                   type="button"
-                  disabled={analyzing || (!selectedFile && !analyzing)}
+                  disabled={analyzing || uploading || !selectedFile || (!selectedFile && !analyzing) || uploadProgress < 100}
                 >
                   {analyzing ? "Analyzing..." : selectedFile ? "Analyze CV" : "Upload CV"}
                 </Button>
+                {loginError && (
+                  <p className="text-red-500 text-xs mt-2 text-center">{loginError}</p>
+                )}
               </CardContent>
             </Card>
           </div>
