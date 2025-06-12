@@ -62,13 +62,15 @@ export default function Header() {
     <header className="border-b bg-white sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <img src="/Clip path group.png" alt="PathFinder Logo" width={32} height={32} className="object-contain" />
-            <span className="font-bold text-xl text-gray-900">PathFinder</span>
-          </Link>
+          <div className="w-[200px]">
+            <Link href="/" className="flex items-center space-x-2">
+              <img src="/Clip path group.png" alt="PathFinder Logo" width={32} height={32} className="object-contain" />
+              <span className="font-bold text-xl text-gray-900">PathFinder</span>
+            </Link>
+          </div>
 
           {!isAuthPage && (
-            <div className="hidden md:flex items-center space-x-8 nav-hide-mid">
+            <div className="hidden md:flex items-center justify-center flex-1 space-x-8 nav-hide-mid">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -101,18 +103,10 @@ export default function Header() {
               >
                 FAQ
               </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => scrollToSection('contact')}
-                className="text-gray-900 font-semibold"
-              >
-                Contact Us
-              </motion.button>
             </div>
           )}
 
-          <div className="flex items-center space-x-4">
+          <div className="w-[200px] flex items-center justify-end space-x-4">
             {!user && !isAuthPage && (
               <>
                 <Link href="/login">
@@ -129,17 +123,12 @@ export default function Header() {
             )}
             {user && (
               <div className="flex items-center space-x-3">
-                <span className="text-[#0B2447] font-semibold">Halo, {user.name.split(" ")[0]}</span>
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setDropdown((v) => !v)}
-                    className="focus:outline-none"
+                    className="focus:outline-none text-[#0B2447] font-semibold hover:text-red-600 transition-colors"
                   >
-                    <img
-                      src={user.photoUrl || "/profile-dummy.png"}
-                      alt="Profile"
-                      className="w-10 h-10 rounded-full object-cover border-2 border-[#0B2447]"
-                    />
+                    Hi, {user.name.split(" ")[0]}
                   </button>
                   {dropdown && (
                     <div className="absolute right-0 mt-2 w-40 bg-white rounded shadow-lg py-2 z-50 border">
