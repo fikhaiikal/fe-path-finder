@@ -159,7 +159,6 @@ export default function LandingPage() {
       const data = await res.json();
       setJobResult(data);
       localStorage.setItem("jobResult", JSON.stringify(data));
-      alert("CV uploaded and analyzed successfully!");
     } catch (err) {
       alert("Failed to upload CV. Please try again.");
     } finally {
