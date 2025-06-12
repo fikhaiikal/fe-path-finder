@@ -139,64 +139,28 @@ export default function LandingPage() {
   };
 
   const handleAnalyzeCV = async () => {
-    setLoginError("");
-    if (!user) {
-      setLoginError("You must be logged in to analyze your CV.");
-      return;
-    }
     if (!selectedFile) return;
     setAnalyzing(true);
+    setLoginError("");
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
-      const res = await fetch("https://be-path-finder.onrender.com/upload/cv", {
+      const res = await fetch("http://0.0.0.0:9000/upload/cv", {
         method: "POST",
         body: formData,
       });
-      if (!res.ok) {
-        throw new Error("Failed to upload CV");
-      }
+
       const responseData = await res.json();
 
-      const combinedResult = {
-        ...responseData,
-        feedback: {
-          strengths: [
-            "Relevant education in Information Technology with an exceptionally high GPA (3.91/4.00 equivalent), demonstrating strong academic aptitude.",
-            "Technical proficiency across key languages (Java, Python, JavaScript, SQL, PHP) and database tools (phpMyAdmin), making you adaptable to diverse development roles.",
-            "Demonstrated UX/UI skills: Experience conducting user research, usability testing, and workflow optimization with quantifiable results (25% efficiency gain).",
-            "Collaboration experience: Proven ability to work with stakeholders and developers to align technical deliverables with project goals.",
-            "Organizational involvement: Experience as a committee member and assistant during college, indicating teamwork and initiative.",
-            "Relevant coursework in Database Systems, Programming, Statistics, and UX Design.",
-            "Exposure to industry tools like Notion, Trello, Miro, Photoshop, and Google Workspace.",
-          ],
-          suggestions: [
-            "Restructure the skills section: Categorize clearly (e.g., 'Languages: Java, Python...', 'Tools: Trello, Miro...', 'Databases: SQL, phpMyAdmin'). Remove filler words.",
-            "Expand experience descriptions: Use bullet points to detail specific projects. Quantify achievements (e.g., 'Reduced testing time by 25% by implementing X').",
-            "Clarify education: Remove redundant skill mentions. State degree clearly (e.g., 'BSc in Information Technology, GPA: 3.91/4.00'). Place RAION Community under 'Leadership' or 'Activities'.",
-            "Complete fragmented content: Define the 'Equicity' project's purpose, your role, and outcomes. Specify how '85 design effectiveness' was measured.",
-            "Detail organizational roles: Describe committee/assistant responsibilities and impacts (e.g., 'Organized X event for 50+ participants').",
-            "Add project context: Mention companies/institutions for work experiences, even if academic.",
-            "Include certifications explicitly: List Revou, Dicoding, or IBM credentials in a 'Certifications' section with dates.",
-            "Prioritize key technologies: Showcase core skills (Python, SQL) more prominently, moving basic tools (Workspace) lower.",
-          ],
-          weaknesses: [
-            "Inconsistent formatting: Skills section contains irrelevant filler words (e.g., 'as', 'an', 'in'), which appears unprofessional.",
-            "Vague descriptions: Work experiences lack specific projects, contexts, and measurable outcomes (e.g., '100 alignment' is unclear).",
-            "Truncated achievements: Abilities section cuts off mid-sentence ('Equicity facilitates easier and...').",
-            "Undefined roles: Responsibilities as an 'organizational committee' and 'assistant' are not explained.",
-            "Duration ambiguity: Only 5 months of professional experience is specified, with no details on company or role.",
-            "Unclear skill grouping: Technical skills (Java), tools (Trello), and certificates (Dicoding) are jumbled together.",
-            "Education section repeats skill section phrases ('proficient in assortment of') instead of focusing on credentials.",
-          ],
-        },
-      };
+      // Cek status dari response dan status HTTP
+      if (!res.ok || responseData.status !== "success") {
+        throw new Error(responseData.message || "Failed to upload CV");
+      }
 
-      console.log("Job Result with feedback:", combinedResult);
-      setJobResult(combinedResult);
-      localStorage.setItem("jobResult", JSON.stringify(combinedResult));
+      setJobResult(responseData);
+      localStorage.setItem("jobResult", JSON.stringify(responseData));
     } catch (err) {
-      alert("Failed to upload CV. Please try again.");
+      alert(err.message || "Failed to upload CV. Please try again.");
     } finally {
       setAnalyzing(false);
     }
@@ -459,7 +423,7 @@ export default function LandingPage() {
       </motion.section>
 
       {/* Feedback Section */}
-      {jobResult && jobResult.feedback ? (
+      {jobResult && jobResult.data && jobResult.data.review ? (
         <motion.section
           id="feedback"
           initial={{ opacity: 0, y: 20 }}
@@ -487,7 +451,7 @@ export default function LandingPage() {
                 <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
                   <div className="p-4 border-t animate-fade-in animate-slide-in-from-top duration-400">
                     <ul className="list-decimal list-inside text-gray-600 text-justify">
-                      {jobResult.feedback.strengths.map((strength, index) => (
+                      {jobResult.data.review.strengths.map((strength, index) => (
                         <li key={index}>{strength}</li>
                       ))}
                     </ul>
@@ -503,7 +467,7 @@ export default function LandingPage() {
                 <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
                   <div className="p-4 border-t animate-fade-in animate-slide-in-from-top duration-400">
                     <ul className="list-decimal list-inside text-gray-600 text-justify">
-                      {jobResult.feedback.suggestions.map((suggestion, index) => (
+                      {jobResult.data.review.suggestions.map((suggestion, index) => (
                         <li key={index}>{suggestion}</li>
                       ))}
                     </ul>
@@ -519,7 +483,7 @@ export default function LandingPage() {
                 <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
                   <div className="p-4 border-t animate-fade-in animate-slide-in-from-top duration-400">
                     <ul className="list-decimal list-inside text-gray-600 text-justify">
-                      {jobResult.feedback.weaknesses.map((weakness, index) => (
+                      {jobResult.data.review.weaknesses.map((weakness, index) => (
                         <li key={index}>{weakness}</li>
                       ))}
                     </ul>
