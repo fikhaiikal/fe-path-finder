@@ -566,7 +566,7 @@ export default function LandingPage() {
                       <span className="text-sm">1 Recommendation Job</span>
                     </div>
                   </div>
-                  <Button className="w-full bg-white text-teal-500 hover:bg-gray-100">Coming Soon</Button>
+                  <Button className="w-full bg-white text-teal-500 hover:bg-gray-100">It's Free!</Button>
                 </CardContent>
               </Card>
 
@@ -595,7 +595,9 @@ export default function LandingPage() {
                       <span className="text-sm">AI Chatbot Feedback</span>
                     </div>
                   </div>
-                  <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white">Coming Soon</Button>
+                  <a href="https://wa.me/6282331076344?text=Halo%2C%20saya%20tertarik%20untuk%20berlangganan%20paket%20Professional%20PathFinder" target="_blank" rel="noopener noreferrer">
+                    <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white">Choose Plan</Button>
+                  </a>
                 </CardContent>
               </Card>
             </div>
